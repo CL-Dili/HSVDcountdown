@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Countdown Timer</title>
+  <style>
+    /* Self-hosted Graphik font with OTF fallback */
+    @font-face {
+      font-family: 'Graphik';
+      src: url('Graphik-Regular.woff2') format('woff2'),
+           url('Graphik-Regular.woff') format('woff'),
+           url('Graphik-Regular.otf') format('opentype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Graphik';
+      src: url('Graphik-Bold.woff2') format('woff2'),
+           url('Graphik-Bold.woff') format('woff'),
+           url('Graphik-Bold.otf') format('opentype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    /* Import DM Serif Display and Sofia Sans */
+    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Sofia+Sans:wght@400;700&display=swap');
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background: #ed1c24;
+      color: #fff;
+      transition: background 0.5s, color 0.5s, font-family 0.5s;
+      overflow: hidden;
+    }
+
+    /* Alternate theme */
+    body.alt-theme {
+      background: #0000ff;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    /* Override fonts in alt-theme */
+    body.alt-theme .countdown h1,
+    body.alt-theme .btn {
+      font-family: 'DM Serif Display', serif;
+    }
+    body.alt-theme .time-segment .number,
+    body.alt-theme .time-segment .label,
+    body.alt-theme #roastMessage,
+    body.alt-theme #tipMessage {
+      font-family: 'Sofia Sans', sans-serif;
+    }
+    body.alt-theme .btn {
+      color: #0000ff;
+    }
+
+    .countdown {
+      padding: 3rem;
+      text-align: center;
+      max-width: 600px;
+    }
+    .countdown h1 {
+      margin-bottom: 1.5rem;
+      font-size: 3rem;
+      font-family: 'Graphik', sans-serif;
+      font-weight: 700;
+      line-height: 1.2;
+      transition: color 0.5s;
+    }
+    .time-segment {
+      display: inline-block;
+      margin: 0 2rem;
+    }
+    .time-segment .number {
+      font-size: 4rem;
+      font-weight: bold;
+      display: block;
+      transition: color 0.5s;
+    }
+    .time-segment .label {
+      text-transform: uppercase;
+      font-size: 1rem;
+      font-family: 'Graphik', sans-serif;
+      margin-top: 0.25rem;
+      display: block;
+      transition: color 0.5s;
+    }
+
+    .btn {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-family: 'Graphik', sans-serif;
+      background: #fff;
+      color: #ed1c24;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+      margin: 0.5rem 0.5rem 0 0;
+    }
+    .btn:hover {
+      background: #f4f4f4;
+    }
+
+    #roastMessage,
+    #tipMessage {
+      margin-top: 1rem;
+      font-size: 1.25rem;
+      min-height: 2em;
+      font-family: 'Graphik', sans-serif;
+      transition: color 0.5s;
+    }
+  </style>
+</head>
+<body>
+  <div class="countdown">
+    <h1>HSV Diligentia '25<br>begint over...</h1>
+    <div id="timer">
+      <div class="time-segment">
+        <span id="days" class="number">0</span>
+        <span class="label">dagen</span>
+      </div>
+      <div class="time-segment">
+        <span id="hours" class="number">0</span>
+        <span class="label">uren</span>
+      </div>
+      <div class="time-segment">
+        <span id="minutes" class="number">0</span>
+        <span class="label">minuten</span>
+      </div>
+    </div>
+    <button class="btn" id="roastBtn">Quote me!</button>
+    <button class="btn" id="toggleStyleBtn">Huisstijl</button>
+    <button class="btn" id="tipBtn">Pro Tip</button>
+    <div id="roastMessage"></div>
+    <div id="tipMessage"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+    // Countdown target date/time
+    var targetDate = new Date("September 26, 2025 17:00:00").getTime();
+
+    function updateTimer() {
+      var now = Date.now();
+      var distance = targetDate - now;
+      if (distance < 0) {
+        document.querySelector('.countdown h1').textContent = 'Als je dit leest, doe een shotje!';
+        document.getElementById('timer').style.display = 'none';
+        clearInterval(intervalId);
+        confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
+        return;
+      }
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      document.getElementById('days').textContent = days;
+      document.getElementById('hours').textContent = hours;
+      document.getElementById('minutes').textContent = minutes;
+    }
+
+    // Roast button
+    var roasts = [
+      "'Heb je kleine fetish tenen?'",
+      "'Je krijgt €5 per uur en dat willen we zien.'",
+      "'Toen stond Marius braaf als een vieze pedofiel buiten.'",
+      "'Maar wacht...heb jij Mein Kampf gelezen?'",
+      "'Mayonaise als glijmiddel en maden in je kut, maar ze lieten je wel klaarkomen. Dus een win is een win!'",
+      "'En ben wel vóór dat kinderen vermoord worden, maar niet dat vrouwen de keuze krijgen.'",
+      "'Ik zei nog tegen Thijs: Poep niet over me heen. Maar hij kon het niet laten.'",
+      "'Ik ga niet voor elke aardige guy op m'n knieën.'",
+      "'Ik ben Nederlands en wit dus dat komt goed.'",
+      "'Marius heeft wel sneller zin dan je denkt.'",
+      "'Misschien moeten we je uit elkaar trekken.'",
+      "'Een zwart ding dat vibreert in de artiestenfoyer.'",
+      "'Er is niemand die mijn tieten gaat likken.'",
+      "'Hij stonk, was lelijk, maar het was wel een goeie.'",
+      "'Ik heb veel dochters, mijn vagina is uitgescheurd.'",
+      "'Hij noemde me zaadslurpertje maar ik slikte z'n zaad niet eens.'",
+      "'En daarom moeten we op grote schaal kinderen onthoofden.'",
+      "'Ik had wel het idee dat er veel transjes waren, ik heb er gewoon nooit zoveel bij elkaar gezien.'",
+      "'Islamitische worst is gewoon een paardenlul.'",
+      "'Omdat zoveel vrouwen aan de pil zitten, en dan al die hormonen uitplassen. En dat komt in het drinkwater en dan worden alle mannen gay?'"
+    ];
+    document.getElementById('roastBtn').addEventListener('click', function() {
+      document.getElementById('tipMessage').textContent = '';
+      var msg = roasts[Math.floor(Math.random() * roasts.length)];
+      document.getElementById('roastMessage').textContent = msg;
+    });
+
+    // Pro Tip button
+    var tips = [
+      "Neem oordoppen mee in geval Tobias weer gaat overgeven.",
+      "Doe geen bier op de hete stenen in de sauna, Xyrian.",
+      "Wij gaan weer naar een uitkijktoren! " + "Heb je hoogtevrees? Geen probleem!",
+      "Paracetamol is geen overbodige luxe. Je eigen rum ook niet.",
+      "Is dit je eerste keer? Succes.",
+      "Er is altijd tijd voor (softcore) porno!",
+      "Even centraal: wijven.",
+      "Ben je lactose intolerant? Wees wat toleranter, joh.",
+      "Als je niet wakker wordt van je eigen wekker, en Carolus wel, schiet hij je neer.",
+      "Nothing beats a Jet2 holiday...behalve HSV Diligentia!",
+      "Vergeet je presentatie niet! ±2 minuten is prima.",
+      "Vergeet je drankje niet!",
+      "Op zaterdagochtend 08:00 gaan we 5km hardlopen!",
+      "Heb je al nummers toegevoegd aan de HSV Diligentia playlist?",
+      "Maak geen biertjes open aan badkamertegels.",
+      "Aankomst is mogelijk vanaf 17:00.",
+      "Stel een noodcontact in.",
+      "Sta je op onbeschikbaar in Eitje?",
+      "Neem Rick Wagenvoort NIET mee, aub.",
+      "Laat het over je heenkomen. Al dan niet letterlijk."
+    ];
+    document.getElementById('tipBtn').addEventListener('click', function() {
+      document.getElementById('roastMessage').textContent = '';
+      var msg = tips[Math.floor(Math.random() * tips.length)];
+      document.getElementById('tipMessage').textContent = msg;
+    });
+
+    // Toggle theme button
+    (function() {
+      var toggleBtn = document.getElementById('toggleStyleBtn');
+      toggleBtn.addEventListener('click', function() {
+        document.body.classList.toggle('alt-theme');
+        toggleBtn.textContent = document.body.classList.contains('alt-theme') ? 'Ouwe stilo' : 'Huisstijl';
+      });
+    })();
+
+    var intervalId = setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+</body>
+</html>
