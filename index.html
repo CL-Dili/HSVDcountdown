@@ -39,7 +39,6 @@
       transition: background 0.5s, color 0.5s, font-family 0.5s;
       overflow: hidden;
     }
-
     /* Alternate theme */
     body.alt-theme {
       background: #0000ff;
@@ -60,7 +59,6 @@
     body.alt-theme .btn {
       color: #0000ff;
     }
-
     .countdown {
       padding: 3rem;
       text-align: center;
@@ -76,7 +74,7 @@
     }
     .time-segment {
       display: inline-block;
-      margin: 0 2rem;
+      margin: 0 1rem;
     }
     .time-segment .number {
       font-size: 4rem;
@@ -92,7 +90,6 @@
       display: block;
       transition: color 0.5s;
     }
-
     .btn {
       margin-top: 1rem;
       padding: 0.75rem 1.5rem;
@@ -109,7 +106,6 @@
     .btn:hover {
       background: #f4f4f4;
     }
-
     #roastMessage,
     #tipMessage {
       margin-top: 1rem;
@@ -135,6 +131,10 @@
       <div class="time-segment">
         <span id="minutes" class="number">0</span>
         <span class="label">minuten</span>
+      </div>
+      <div class="time-segment">
+        <span id="seconds" class="number">0</span>
+        <span class="label">seconden</span>
       </div>
     </div>
     <button class="btn" id="roastBtn">Quote me!</button>
@@ -162,24 +162,26 @@
       var days = Math.floor(distance / (1000 * 60 * 60 * 24));
       var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
       document.getElementById('days').textContent = days;
       document.getElementById('hours').textContent = hours;
       document.getElementById('minutes').textContent = minutes;
+      document.getElementById('seconds').textContent = seconds;
     }
 
     // Roast button
     var roasts = [
       "'Heb je kleine fetish tenen?'",
       "'Je krijgt €5 per uur en dat willen we zien.'",
-      "'Toen stond Marius braaf als een vieze pedofiel buiten.'",
+      "'Hoe plompiger de toren, hoe vleziger de lippen.'",
       "'Maar wacht...heb jij Mein Kampf gelezen?'",
       "'Mayonaise als glijmiddel en maden in je kut, maar ze lieten je wel klaarkomen. Dus een win is een win!'",
       "'En ben wel vóór dat kinderen vermoord worden, maar niet dat vrouwen de keuze krijgen.'",
       "'Ik zei nog tegen Thijs: Poep niet over me heen. Maar hij kon het niet laten.'",
       "'Ik ga niet voor elke aardige guy op m'n knieën.'",
       "'Ik ben Nederlands en wit dus dat komt goed.'",
-      "'Marius heeft wel sneller zin dan je denkt.'",
-      "'Misschien moeten we je uit elkaar trekken.'",
+      "'Ik zou gelijk mijn kontje verkopen op internet.'",
+      "'In principe wordt er niet gevingerd onder werktijd.'",
       "'Een zwart ding dat vibreert in de artiestenfoyer.'",
       "'Er is niemand die mijn tieten gaat likken.'",
       "'Hij stonk, was lelijk, maar het was wel een goeie.'",
@@ -188,7 +190,18 @@
       "'En daarom moeten we op grote schaal kinderen onthoofden.'",
       "'Ik had wel het idee dat er veel transjes waren, ik heb er gewoon nooit zoveel bij elkaar gezien.'",
       "'Islamitische worst is gewoon een paardenlul.'",
-      "'Omdat zoveel vrouwen aan de pil zitten, en dan al die hormonen uitplassen. En dat komt in het drinkwater en dan worden alle mannen gay?'"
+      "'Omdat zoveel vrouwen aan de pil zitten, en dan al die hormonen uitplassen. En dat komt in het drinkwater en dan worden alle mannen gay?'",
+      // 10 extra placeholders
+      "'We gaan d'r as uitstrooien in Droomvlucht.'",
+      "'Vibrators hebben niks met sex te maken.'",
+      "'Ik ga een staafmixer in m'n hol stoppen; er staat niet dat het niet kan.'",
+      "'A shoulder to cry on is a dick to ride on.'",
+      "'Als je de kans hebt om Tania Kross te beffen, dan moet je dat doen.'",
+      "'Maar er zijn een boel dingen die leuk zijn maar waar ik niet aan zou likken.'",
+      "'De dingen die ik met je oma doe, Marius...dat is pas echte arbeid.'",
+      "'Alles kan kapot. Ook mijn aars.'",
+      "'Van mijn meeste vrienden heb ik wel eens wat afgelikt.'",
+      "'Je krijgt niet bij je diploma ook een kutje aangemeten.'"
     ];
     document.getElementById('roastBtn').addEventListener('click', function() {
       document.getElementById('tipMessage').textContent = '';
