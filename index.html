@@ -28,11 +28,13 @@
       display: grid;
       place-items: center;
       min-height: 100dvh;
+      box-sizing: border-box;
       margin: 0;
       background: var(--bg);
       color: var(--fg);
       transition: background 0.5s, color 0.5s, font-family 0.5s;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       padding: calc(env(safe-area-inset-top, 0) + 12px)
                calc(env(safe-area-inset-right, 0) + 12px)
                calc(env(safe-area-inset-bottom, 0) + 12px)
@@ -43,6 +45,7 @@
     body.alt-theme .countdown h1, body.alt-theme .btn { font-family: 'DM Serif Display', serif; }
     body.alt-theme .time-segment .number,
     body.alt-theme .time-segment .label,
+    body.alt-theme .location,
     body.alt-theme #roastMessage,
     body.alt-theme #tipMessage { font-family: 'Sofia Sans', sans-serif; }
     body.alt-theme .btn { color: #0000ff; }
@@ -94,6 +97,33 @@
       opacity: 0.9;
     }
 
+    .location {
+      display: grid;
+      gap: 0.25rem;
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: saturate(120%) blur(4px);
+      font-family: 'Graphik', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    .location h2 {
+      margin: 0;
+      font-size: clamp(0.75rem, 2.5vw, 0.95rem);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.85;
+    }
+
+    .location address {
+      margin: 0;
+      font-size: clamp(1.05rem, 3.4vw, 1.25rem);
+      font-style: normal;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
     .btn-row{
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -102,6 +132,7 @@
     }
     @media (max-width: 520px){
       .btn-row{ grid-template-columns: 1fr; }
+      .countdown { padding-block: 1rem; }
     }
 
     .btn {
@@ -150,6 +181,11 @@
         <span class="label">seconden</span>
       </div>
     </div>
+
+    <section class="location" aria-labelledby="location-title">
+      <h2 id="location-title">Locatie</h2>
+      <address id="location-address">Nog even geheim</address>
+    </section>
 
     <div class="btn-row">
       <button class="btn" id="roastBtn" aria-controls="roastMessage">Quote me!</button>
