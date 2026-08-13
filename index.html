@@ -47,8 +47,7 @@
     body.alt-theme .time-segment .label,
     body.alt-theme .location,
     body.alt-theme .footer,
-    body.alt-theme #roastMessage,
-    body.alt-theme #tipMessage { font-family: 'Sofia Sans', sans-serif; }
+    body.alt-theme #message { font-family: 'Sofia Sans', sans-serif; }
     body.alt-theme .btn { color: #0000ff; }
 
     .countdown {
@@ -158,7 +157,7 @@
     .btn:active { transform: translateY(1px); }
     .btn:hover { background: #f4f4f4; }
 
-    #roastMessage, #tipMessage {
+    #message {
       margin-top: 0.75rem;
       font-size: clamp(1.05rem, 3.4vw, 1.25rem);
       min-height: 2.2em;
@@ -204,15 +203,14 @@
     </section>
 
     <div class="btn-row">
-      <button class="btn" id="roastBtn" aria-controls="roastMessage">Quote me!</button>
+      <button class="btn" id="roastBtn" aria-controls="message">Quote me!</button>
       <button class="btn" id="toggleStyleBtn">Huisstijl</button>
-      <button class="btn" id="tipBtn" aria-controls="tipMessage">Pro Tip</button>
+      <button class="btn" id="tipBtn" aria-controls="message">Pro Tip</button>
     </div>
 
-    <div id="roastMessage" role="status" aria-live="polite"></div>
-    <div id="tipMessage" role="status" aria-live="polite"></div>
+    <div id="message" role="status" aria-live="polite"></div>
 
-    <footer class="footer">HSV Diligentia ’26 · NIX18 · Maak er geen HR-casus van</footer>
+    <footer class="footer">HSV Diligentia ’26 · NIX18 · Maak er geen HR-casus van.</footer>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -270,7 +268,7 @@
       var distance = targetDate - now;
 
       if (distance <= 0) {
-        document.getElementById('event-title').textContent = "HSV Diligentia '26 is begonnen! Als je dit leest, doe een shotje!";
+        document.getElementById('event-title').textContent = "HSV Diligentia '26 is begonnen! God sta ons bij. Als je dit leest, doe een shotje!";
         document.getElementById('timer').hidden = true;
         clearInterval(intervalId);
         launchCelebration();
@@ -347,16 +345,14 @@
     }
 
     document.getElementById('roastBtn').addEventListener('click', function() {
-      document.getElementById('tipMessage').textContent = '';
       var msg = roasts[Math.floor(Math.random()*roasts.length)];
-      document.getElementById('roastMessage').textContent = msg;
+      document.getElementById('message').textContent = msg;
       vibrate();
     });
 
     document.getElementById('tipBtn').addEventListener('click', function() {
-      document.getElementById('roastMessage').textContent = '';
       var msg = tips[Math.floor(Math.random()*tips.length)];
-      document.getElementById('tipMessage').textContent = msg;
+      document.getElementById('message').textContent = msg;
       vibrate();
     });
 
