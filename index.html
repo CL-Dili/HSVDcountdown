@@ -99,7 +99,7 @@
 
     .location {
       display: grid;
-      gap: 0.25rem;
+      gap: 0.65rem;
       margin-top: 1rem;
       padding: 0.85rem 1rem;
       border-radius: var(--radius);
@@ -116,18 +116,62 @@
       opacity: 0.85;
     }
 
-    .location address {
+    .location address,
+    .location dl {
+      margin: 0;
+      font-style: normal;
+    }
+
+    .location-details {
+      display: grid;
+      gap: 0.45rem;
+      text-align: left;
+    }
+
+    .location-row {
+      display: grid;
+      grid-template-columns: minmax(5.5rem, 0.8fr) minmax(0, 1.4fr);
+      gap: 0.75rem;
+      align-items: baseline;
+      padding-top: 0.45rem;
+      border-top: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .location-row:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .location-row dt {
+      font-size: clamp(0.7rem, 2.2vw, 0.82rem);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.045em;
+      opacity: 0.72;
+    }
+
+    .location-row dd {
       margin: 0;
       font-size: clamp(1.05rem, 3.4vw, 1.25rem);
-      font-style: normal;
       font-weight: 700;
       line-height: 1.35;
+      overflow-wrap: anywhere;
     }
 
     .location a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3em;
       color: inherit;
       text-decoration-thickness: 0.08em;
       text-underline-offset: 0.18em;
+    }
+
+    .maps-icon {
+      width: 1em;
+      height: 1em;
+      flex: 0 0 auto;
+      fill: currentColor;
     }
 
     .btn-row{
@@ -199,7 +243,26 @@
 
     <section class="location" aria-labelledby="location-title">
       <h2 id="location-title">Locatie</h2>
-      <address id="location-address">Nog even geheim...</address>
+      <address>
+        <dl class="location-details">
+          <div class="location-row">
+            <dt>Adres</dt>
+            <dd id="location-street">...</dd>
+          </div>
+          <div class="location-row">
+            <dt>Postcode</dt>
+            <dd id="location-postcode">...</dd>
+          </div>
+          <div class="location-row">
+            <dt>Plaats</dt>
+            <dd id="location-town">...</dd>
+          </div>
+          <div class="location-row">
+            <dt>Provincie</dt>
+            <dd id="location-province">Overijssel</dd>
+          </div>
+        </dl>
+      </address>
     </section>
 
     <div class="btn-row">
@@ -218,26 +281,50 @@
     var targetDate = new Date("2026-09-18T17:00:00+02:00").getTime();
     var hasCelebrated = false;
 
-    /* Replace these two values when the location may be revealed. */
+    /* Reveal the location one line at a time by replacing these values. */
     var eventLocation = {
-      text: "Nog even geheim",
+      address: "Nog even geheim",
+      postcode: "Nog even geheim",
+      town: "Nog even geheim",
+      province: "Nog even geheim",
       mapsUrl: ""
     };
 
     function renderLocation() {
-      var address = document.getElementById('location-address');
-      address.textContent = '';
+      var placeholder = 'Nog even geheim';
+      var fields = {
+        province: 'location-province',
+        town: 'location-town',
+        postcode: 'location-postcode',
+        address: 'location-street'
+      };
+
+      Object.keys(fields).forEach(function(key) {
+        var field = document.getElementById(fields[key]);
+        field.textContent = eventLocation[key] || placeholder;
+      });
 
       if (eventLocation.mapsUrl) {
+        var address = document.getElementById('location-street');
         var link = document.createElement('a');
+        var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        var iconPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         link.href = eventLocation.mapsUrl;
-        link.textContent = eventLocation.text;
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
-        link.setAttribute('aria-label', eventLocation.text + ' openen in Maps');
+        link.setAttribute('aria-label', (eventLocation.address || 'Locatie') + ' openen in Maps');
+
+        icon.setAttribute('class', 'maps-icon');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.setAttribute('focusable', 'false');
+        iconPath.setAttribute('d', 'M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z');
+        icon.appendChild(iconPath);
+
+        address.textContent = '';
+        link.appendChild(document.createTextNode(eventLocation.address || placeholder));
+        link.appendChild(icon);
         address.appendChild(link);
-      } else {
-        address.textContent = eventLocation.text;
       }
     }
 
@@ -325,7 +412,7 @@
       "Heb je hoogtevrees? Geen probleem!", "Heb je laagtevrees? Blijf uit de buurt van Isis.",
       "Paracetamol is geen overbodige luxe. Je eigen rum ook niet.",
       "Is dit je eerste keer? Succes.","Er is altijd tijd voor (softcore) porno!",
-      "Even centraal: wijven.", "Maandag 10 moeten we pleitos!",
+      "Even centraal: wijven.", "Maandag 11:00 moeten we pleitos!",
       "Wil je daar een lolly bij?", "NIX 18",
       "Als je niet wakker wordt van je eigen wekker, en Carolus wel, schiet hij je neer.",
       "Vergeet niet de vrijdagavond drank-activiteit!",
