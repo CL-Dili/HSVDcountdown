@@ -66,12 +66,23 @@
       word-wrap: break-word;
     }
 
+    .event-subtitle {
+      display: block;
+      margin-top: 0.35em;
+      font-size: 0.58em;
+      font-weight: 400;
+      line-height: 1.25;
+    }
+
     #timer {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
       gap: var(--gap);
       margin: 1rem 0 0.5rem;
     }
+
+    /* Keep the grid hidden when the countdown has finished. */
+    #timer[hidden] { display: none; }
 
     .time-segment {
       display: grid;
@@ -201,6 +212,41 @@
     .btn:active { transform: translateY(1px); }
     .btn:hover { background: #f4f4f4; }
 
+    .instructions-btn {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 1rem;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .instructions-dialog {
+      box-sizing: border-box;
+      width: min(360px, calc(100% - 2rem));
+      padding: 1.5rem;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Graphik', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    }
+    .instructions-dialog:not([open]) { display: none; }
+    .instructions-dialog::backdrop { background: rgba(0,0,0,0.45); }
+    .instructions-dialog p {
+      margin: 0 0 1.25rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .instructions-dialog form { margin: 0; }
+    body.alt-theme .instructions-dialog {
+      background: #0000ff;
+      font-family: 'Sofia Sans', sans-serif;
+    }
+
     #message {
       margin-top: 0.75rem;
       font-size: clamp(1.05rem, 3.4vw, 1.25rem);
@@ -271,15 +317,57 @@
       <button class="btn" id="tipBtn" aria-controls="message">Pro Tip</button>
     </div>
 
+    <button class="btn instructions-btn" id="instructionsBtn" type="button"
+            aria-haspopup="dialog" aria-controls="instructions-dialog">
+      Instructieboekje
+    </button>
+
     <div id="message" role="status" aria-live="polite"></div>
 
     <footer class="footer">HSV Diligentia ’26 · NIX18 · Maak er geen HR-casus van.</footer>
   </div>
 
+  <dialog class="instructions-dialog" id="instructions-dialog" aria-labelledby="instructions-wait-message">
+    <p id="instructions-wait-message">Nog even wachten...</p>
+    <form method="dialog">
+      <button class="btn" type="submit" autofocus>Oké lul</button>
+    </form>
+  </dialog>
+
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script>
     var targetDate = new Date("2026-09-18T17:00:00+02:00").getTime();
     var hasCelebrated = false;
+
+    /* After uploading the PDF beside this HTML, change false to true. */
+    var instructionsReady = false;
+    var instructionsFile = "HSVD_Instructieboek-26.pdf";
+
+    function setupInstructions() {
+      var button = document.getElementById('instructionsBtn');
+
+      if (instructionsReady) {
+        var link = document.createElement('a');
+        link.id = button.id;
+        link.className = button.className;
+        link.textContent = 'Instructieboekje';
+        link.href = instructionsFile;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.setAttribute('aria-label', 'Instructieboekje (PDF, opent in een nieuw tabblad)');
+        button.replaceWith(link);
+        return;
+      }
+
+      button.addEventListener('click', function() {
+        var dialog = document.getElementById('instructions-dialog');
+        if (typeof dialog.showModal === 'function') {
+          if (!dialog.open) dialog.showModal();
+        } else {
+          window.alert('Nog even wachten...');
+        }
+      });
+    }
 
     /* Reveal the location one line at a time by replacing these values. */
     var eventLocation = {
@@ -355,7 +443,7 @@
       var distance = targetDate - now;
 
       if (distance <= 0) {
-        document.getElementById('event-title').textContent = "HSV Diligentia '26 is begonnen! God sta ons bij. Als je dit leest, doe een shotje!";
+        document.getElementById('event-title').innerHTML = "HSV Diligentia ’26 is begonnen!<span class=\"event-subtitle\">God sta ons bij. Doe een shotje!</span>";
         document.getElementById('timer').hidden = true;
         clearInterval(intervalId);
         launchCelebration();
@@ -452,6 +540,7 @@
       });
     })();
 
+    setupInstructions();
     renderLocation();
     var intervalId = setInterval(updateTimer, 1000);
     updateTimer();
