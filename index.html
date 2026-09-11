@@ -322,6 +322,11 @@
       Instructieboekje
     </button>
 
+    <button class="btn instructions-btn" id="corveeBtn" type="button"
+            aria-haspopup="dialog" aria-controls="instructions-dialog">
+      Corveelijst
+    </button>
+
     <div id="message" role="status" aria-live="polite"></div>
 
     <footer class="footer">HSV Diligentia ’26 · NIX18 · Maak er geen HR-casus van.</footer>
@@ -330,7 +335,7 @@
   <dialog class="instructions-dialog" id="instructions-dialog" aria-labelledby="instructions-wait-message">
     <p id="instructions-wait-message">Nog even wachten...</p>
     <form method="dialog">
-      <button class="btn" type="submit" autofocus>Oké lul</button>
+      <button class="btn" type="submit" autofocus>Oké</button>
     </form>
   </dialog>
 
@@ -339,22 +344,24 @@
     var targetDate = new Date("2026-09-18T17:00:00+02:00").getTime();
     var hasCelebrated = false;
 
-    /* After uploading the PDF beside this HTML, change false to true. */
+    /* After uploading each PDF beside this HTML, change its Ready value to true. */
     var instructionsReady = false;
     var instructionsFile = "HSVD_Instructieboek-26.pdf";
+    var corveeReady = false;
+    var corveeFile = "HSVD_Corveelijst-26.pdf";
 
-    function setupInstructions() {
-      var button = document.getElementById('instructionsBtn');
+    function setupPdfButton(buttonId, ready, file) {
+      var button = document.getElementById(buttonId);
 
-      if (instructionsReady) {
+      if (ready) {
         var link = document.createElement('a');
         link.id = button.id;
         link.className = button.className;
-        link.textContent = 'Instructieboekje';
-        link.href = instructionsFile;
+        link.textContent = button.textContent.trim();
+        link.href = file;
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
-        link.setAttribute('aria-label', 'Instructieboekje (PDF, opent in een nieuw tabblad)');
+        link.setAttribute('aria-label', link.textContent + ' (PDF, opent in een nieuw tabblad)');
         button.replaceWith(link);
         return;
       }
@@ -540,7 +547,8 @@
       });
     })();
 
-    setupInstructions();
+    setupPdfButton('instructionsBtn', instructionsReady, instructionsFile);
+    setupPdfButton('corveeBtn', corveeReady, corveeFile);
     renderLocation();
     var intervalId = setInterval(updateTimer, 1000);
     updateTimer();
