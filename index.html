@@ -110,9 +110,11 @@
 
     .location {
       display: grid;
-      gap: 0.65rem;
+      grid-template-columns: minmax(0, 0.85fr) minmax(200px, 1.15fr);
+      gap: 1rem;
+      align-items: center;
       margin-top: 1rem;
-      padding: 0.85rem 1rem;
+      padding: 0.75rem;
       border-radius: var(--radius);
       background: rgba(255,255,255,0.12);
       backdrop-filter: saturate(120%) blur(4px);
@@ -120,59 +122,63 @@
     }
 
     .location h2 {
-      margin: 0;
-      font-size: clamp(0.75rem, 2.5vw, 0.95rem);
+      margin: 0 0 0.5rem;
+      font-size: 0.875rem;
       text-transform: uppercase;
       letter-spacing: 0.06em;
       opacity: 0.85;
     }
 
-    .location address,
-    .location dl {
-      margin: 0;
-      font-style: normal;
-    }
-
-    .location-details {
-      display: grid;
-      gap: 0.45rem;
+    .location-copy {
+      min-width: 0;
       text-align: left;
     }
 
-    .location-row {
-      display: grid;
-      grid-template-columns: minmax(5.5rem, 0.8fr) minmax(0, 1.4fr);
-      gap: 0.75rem;
-      align-items: baseline;
-      padding-top: 0.45rem;
-      border-top: 1px solid rgba(255,255,255,0.18);
-    }
-
-    .location-row:first-child {
-      padding-top: 0;
-      border-top: 0;
-    }
-
-    .location-row dt {
-      font-size: clamp(0.7rem, 2.2vw, 0.82rem);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.045em;
-      opacity: 0.72;
-    }
-
-    .location-row dd {
-      margin: 0;
-      font-size: clamp(1.05rem, 3.4vw, 1.25rem);
+    .location-name {
+      margin: 0 0 0.25rem;
+      font-size: 1.125rem;
       font-weight: 700;
       line-height: 1.35;
+    }
+
+    .location address {
+      margin: 0;
+      font-style: normal;
+      font-size: clamp(1rem, 2.6vw, 1.1rem);
+      font-weight: 700;
+      line-height: 1.5;
       overflow-wrap: anywhere;
     }
 
-    .location a {
+    #location-province {
+      font-size: 0.875rem;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+
+    .maps-link {
       display: inline-flex;
       align-items: center;
-      gap: 0.3em;
+      gap: 0.35em;
+      margin-top: 0.65rem;
+      min-height: 2.75rem;
+      font-size: 0.875rem;
+      line-height: 1.35;
+      color: inherit;
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.18em;
+    }
+
+    .maps-link[hidden] { display: none; }
+
+    .station-info {
+      margin: 0.25rem 0 0;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .station-info a {
       color: inherit;
       text-decoration-thickness: 0.08em;
       text-underline-offset: 0.18em;
@@ -183,6 +189,26 @@
       height: 1em;
       flex: 0 0 auto;
       fill: currentColor;
+    }
+
+    .location-map {
+      display: block;
+      width: 100%;
+      height: 200px;
+      border: 0;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    @media (max-width: 480px) {
+      .location { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .pdf-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
     }
 
     .btn-row{
@@ -213,10 +239,15 @@
     .btn:hover { background: #f4f4f4; }
 
     .instructions-btn {
-      display: block;
+      display: grid;
+      place-items: center;
       width: 100%;
+      min-width: 0;
       box-sizing: border-box;
-      margin-top: 1rem;
+      padding: 0.85rem 0.5rem;
+      font-size: clamp(0.875rem, 2.8vw, 1rem);
+      line-height: 1.25;
+      overflow-wrap: anywhere;
       text-align: center;
       text-decoration: none;
     }
@@ -288,44 +319,51 @@
     </div>
 
     <section class="location" aria-labelledby="location-title">
-      <h2 id="location-title">Locatie</h2>
-      <address>
-        <dl class="location-details">
-          <div class="location-row">
-            <dt>Adres</dt>
-            <dd id="location-street">...</dd>
-          </div>
-          <div class="location-row">
-            <dt>Postcode</dt>
-            <dd id="location-postcode">7722HW</dd>
-          </div>
-          <div class="location-row">
-            <dt>Plaats</dt>
-            <dd id="location-town">Dalfsen</dd>
-          </div>
-          <div class="location-row">
-            <dt>Provincie</dt>
-            <dd id="location-province">Overijssel</dd>
-          </div>
-        </dl>
-      </address>
+      <div class="location-copy">
+        <h2 id="location-title">Locatie</h2>
+        <p class="location-name">De Hammerhoeve</p>
+        <address>
+          <span id="location-street">Hammerweg 10</span><br>
+          <span id="location-postcode">7722 HW</span> <span id="location-town">Dalfsen</span><br>
+          <span id="location-province">Overijssel</span>
+        </address>
+        <a class="maps-link" id="location-maps-link"
+           href="https://maps.app.goo.gl/N82NCdV5PT8qiB4r9" target="_blank" rel="noopener noreferrer"
+           aria-label="Hammerweg 10, Dalfsen openen in Google Maps (nieuw tabblad)">
+          <svg class="maps-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/>
+          </svg>
+          Open in Google Maps
+        </a>
+        <p class="station-info">
+          Dichtstbijzijnde treinstation:
+          <a href="https://maps.app.goo.gl/JscHQtVdEe6NYabn8" target="_blank" rel="noopener noreferrer"
+             aria-label="Station Ommen openen in Google Maps (nieuw tabblad)">Station Ommen</a>
+        </p>
+      </div>
+      <iframe class="location-map" id="location-map"
+              title="Google Maps: Hammerweg 10, 7722 HW Dalfsen"
+              src="https://www.google.com/maps?q=Hammerweg%2010%2C%207722%20HW%20Dalfsen%2C%20Nederland&amp;z=15&amp;hl=nl&amp;output=embed"
+              width="320" height="200" loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </section>
+
+    <div class="pdf-row">
+      <button class="btn instructions-btn" id="instructionsBtn" type="button"
+              aria-haspopup="dialog" aria-controls="instructions-dialog">
+        Instructieboekje
+      </button>
+      <button class="btn instructions-btn" id="corveeBtn" type="button"
+              aria-haspopup="dialog" aria-controls="instructions-dialog">
+        Corveelijst
+      </button>
+    </div>
 
     <div class="btn-row">
       <button class="btn" id="roastBtn" aria-controls="message">Quote me!</button>
       <button class="btn" id="toggleStyleBtn">Huisstijl</button>
       <button class="btn" id="tipBtn" aria-controls="message">Pro Tip</button>
     </div>
-
-    <button class="btn instructions-btn" id="instructionsBtn" type="button"
-            aria-haspopup="dialog" aria-controls="instructions-dialog">
-      Instructieboekje
-    </button>
-
-    <button class="btn instructions-btn" id="corveeBtn" type="button"
-            aria-haspopup="dialog" aria-controls="instructions-dialog">
-      Corveelijst
-    </button>
 
     <div id="message" role="status" aria-live="polite"></div>
 
@@ -335,7 +373,7 @@
   <dialog class="instructions-dialog" id="instructions-dialog" aria-labelledby="instructions-wait-message">
     <p id="instructions-wait-message">Nog even wachten...</p>
     <form method="dialog">
-      <button class="btn" type="submit" autofocus>Oké kut</button>
+      <button class="btn" type="submit" autofocus>Oké</button>
     </form>
   </dialog>
 
@@ -344,10 +382,10 @@
     var targetDate = new Date("2026-09-18T17:00:00+02:00").getTime();
     var hasCelebrated = false;
 
-    /* After uploading each PDF beside this HTML, change its Ready value to true. */
-    var instructionsReady = false;
+    /* Both PDFs are available. Set a Ready value to false to show the waiting popup again. */
+    var instructionsReady = true;
     var instructionsFile = "HSVD_Instructieboek-26.pdf";
-    var corveeReady = false;
+    var corveeReady = true;
     var corveeFile = "HSVD_Corveelijst-26.pdf";
 
     function setupPdfButton(buttonId, ready, file) {
@@ -376,13 +414,13 @@
       });
     }
 
-    /* Reveal the location one line at a time by replacing these values. */
+    /* Update the address and Google Maps link here. The embedded map follows the address. */
     var eventLocation = {
-      address: "...",
-      postcode: "7722HW",
+      address: "Hammerweg 10",
+      postcode: "7722 HW",
       town: "Dalfsen",
       province: "Overijssel",
-      mapsUrl: ""
+      mapsUrl: "https://maps.app.goo.gl/N82NCdV5PT8qiB4r9"
     };
 
     function renderLocation() {
@@ -399,28 +437,20 @@
         field.textContent = eventLocation[key] || placeholder;
       });
 
+      var link = document.getElementById('location-maps-link');
+      link.hidden = !eventLocation.mapsUrl;
       if (eventLocation.mapsUrl) {
-        var address = document.getElementById('location-street');
-        var link = document.createElement('a');
-        var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        var iconPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         link.href = eventLocation.mapsUrl;
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
-        link.setAttribute('aria-label', (eventLocation.address || 'Locatie') + ' openen in Maps');
-
-        icon.setAttribute('class', 'maps-icon');
-        icon.setAttribute('viewBox', '0 0 24 24');
-        icon.setAttribute('aria-hidden', 'true');
-        icon.setAttribute('focusable', 'false');
-        iconPath.setAttribute('d', 'M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z');
-        icon.appendChild(iconPath);
-
-        address.textContent = '';
-        link.appendChild(document.createTextNode(eventLocation.address || placeholder));
-        link.appendChild(icon);
-        address.appendChild(link);
+        link.setAttribute('aria-label', eventLocation.address + ', ' + eventLocation.town + ' openen in Google Maps (nieuw tabblad)');
       }
+
+      var map = document.getElementById('location-map');
+      var fullAddress = eventLocation.address + ', ' + eventLocation.postcode + ' ' + eventLocation.town;
+      var mapUrl = 'https://www.google.com/maps?q=' + encodeURIComponent(fullAddress + ', Nederland') + '&z=15&hl=nl&output=embed';
+      map.title = 'Google Maps: ' + fullAddress;
+      if (map.getAttribute('src') !== mapUrl) map.src = mapUrl;
     }
 
     function launchCelebration() {
@@ -505,7 +535,7 @@
       "RIP geen sauna dit jaar...", "Er komt een corveelijst dit jaar!", "Bankzitters opzetten = bak trekken.", "Klachten? Bereik ons via n.jonker@diligentia-pepijn.nl",
       "Wij gaan weer naar een uitkijktoren!", "Er komt een kamerindeling dit jaar!", "Vodka-karnemelk smaakt verrassend naar Optimel.",
       "Heb je hoogtevrees? Geen probleem!", "Heb je laagtevrees? Blijf uit de buurt van Isis.",
-      "Paracetamol is geen overbodige luxe. Je eigen rum ook niet.", "Als alcohol je korte termijngeheugen kan beschadigen, kun je nagaan wat alcohol voor schade kan aanrichten.",
+      "Paracetamol is geen overbodige luxe. Je eigen rum ook niet.",
       "Is dit je eerste keer? Succes.","Er is altijd tijd voor (softcore) porno!",
       "Even centraal: wijven.", "Maandag 10:00 moeten we pleitos!",
       "Wil je daar een lolly bij?", "NIX 18", "Slay • Serve • Survive",
