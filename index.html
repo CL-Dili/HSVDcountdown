@@ -206,7 +206,7 @@
 
     .pdf-row {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 0.75rem;
       margin-top: 1rem;
     }
@@ -218,6 +218,8 @@
       margin-top: 1rem;
     }
     @media (max-width: 520px){
+      .pdf-row{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #roomsBtn{ grid-column: 1 / -1; }
       .btn-row{ grid-template-columns: 1fr 1fr; }
       #tipBtn{ grid-column: 1 / -1; }
       .countdown { padding-block: 1rem; }
@@ -336,7 +338,7 @@
           Open in Google Maps
         </a>
         <p class="station-info">
-          Dichtstbijzijnde treinstation:
+          dichtstbijzijnde treinstation:
           <a href="https://maps.app.goo.gl/JscHQtVdEe6NYabn8" target="_blank" rel="noopener noreferrer"
              aria-label="Station Ommen openen in Google Maps (nieuw tabblad)">Station Ommen</a>
         </p>
@@ -356,6 +358,10 @@
       <button class="btn instructions-btn" id="corveeBtn" type="button"
               aria-haspopup="dialog" aria-controls="instructions-dialog">
         Corveelijst
+      </button>
+      <button class="btn instructions-btn" id="roomsBtn" type="button"
+              aria-haspopup="dialog" aria-controls="instructions-dialog">
+        Kamerindeling
       </button>
     </div>
 
@@ -382,11 +388,13 @@
     var targetDate = new Date("2026-09-18T17:00:00+02:00").getTime();
     var hasCelebrated = false;
 
-    /* Both PDFs are available. Set a Ready value to false to show the waiting popup again. */
+    /* Set a Ready value to false to show the waiting popup instead of opening that PDF. */
     var instructionsReady = true;
     var instructionsFile = "HSVD_Instructieboek-26.pdf";
     var corveeReady = true;
     var corveeFile = "HSVD_Corveelijst-26.pdf";
+    var roomsReady = true;
+    var roomsFile = "HSVD_Kamerindeling-26.pdf";
 
     function setupPdfButton(buttonId, ready, file) {
       var button = document.getElementById(buttonId);
@@ -537,7 +545,7 @@
       "Heb je hoogtevrees? Geen probleem!", "Heb je laagtevrees? Blijf uit de buurt van Isis.",
       "Paracetamol is geen overbodige luxe. Je eigen rum ook niet.",
       "Is dit je eerste keer? Succes.","Er is altijd tijd voor (softcore) porno!",
-      "Even centraal: wijven.", "Maandag 10:00 moeten we pleitos!", "🔵🔵",
+      "Even centraal: wijven.", "Maandag 10:00 moeten we pleitos!",
       "Wil je daar een lolly bij?", "NIX 18", "Slay • Serve • Survive",
       "Als je niet wakker wordt van je eigen wekker, en Carolus wel, schiet hij je neer.",
       "Vergeet niet de vrijdagavond drank-activiteit!", "Zaterdag padellen? Xyrian hoeft niet.",
@@ -579,6 +587,7 @@
 
     setupPdfButton('instructionsBtn', instructionsReady, instructionsFile);
     setupPdfButton('corveeBtn', corveeReady, corveeFile);
+    setupPdfButton('roomsBtn', roomsReady, roomsFile);
     renderLocation();
     var intervalId = setInterval(updateTimer, 1000);
     updateTimer();
