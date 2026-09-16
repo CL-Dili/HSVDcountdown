@@ -74,6 +74,25 @@
       line-height: 1.25;
     }
 
+    .title-trigger {
+      display: block;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: none;
+      color: inherit;
+      font: inherit;
+      text-align: inherit;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .title-trigger:focus-visible {
+      outline: 2px dashed currentColor;
+      outline-offset: 6px;
+    }
+
     #timer {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -93,6 +112,26 @@
       backdrop-filter: saturate(120%) blur(4px);
     }
 
+    /* Restart this short heartbeat whenever the countdown ticks. */
+    #timer.is-pulsing .time-segment {
+      animation: countdown-pulse 700ms ease-out;
+    }
+
+    @keyframes countdown-pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(255,255,255,0);
+      }
+      24% {
+        transform: scale(1.045);
+        box-shadow: 0 0 18px rgba(255,255,255,0.28);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #timer.is-pulsing .time-segment { animation: none; }
+    }
+
     .time-segment .number {
       font-size: clamp(1.8rem, 8vw, 3.2rem);
       font-weight: 800;
@@ -106,6 +145,26 @@
       margin-top: 0.35rem;
       letter-spacing: 0.04em;
       opacity: 0.9;
+    }
+
+    /* Give the last minute one large, pulsing seconds display. */
+    #timer.final-minute {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    #timer.final-minute #seg-seconds {
+      padding: clamp(1rem, 4vw, 2rem) 0.5rem;
+    }
+
+    #timer.final-minute #seconds {
+      font-size: clamp(5rem, 44vw, 18rem);
+      font-variant-numeric: tabular-nums;
+      line-height: 0.95;
+    }
+
+    #timer.final-minute .label {
+      margin-top: 1rem;
+      font-size: clamp(0.9rem, 3vw, 1.15rem);
     }
 
     .location {
@@ -299,7 +358,11 @@
 </head>
 <body>
   <div class="countdown">
-    <h1 id="event-title" aria-live="polite">HSV Diligentia '26<br>begint over…</h1>
+    <h1 id="event-title" aria-live="polite">
+      <button class="title-trigger" id="confettiTrigger" type="button" title="Klik voor een beetje confetti!">
+        <span id="event-title-text">HSV Diligentia '26<br>begint over…</span>
+      </button>
+    </h1>
 
     <div id="timer">
       <div class="time-segment" id="seg-days">
@@ -387,6 +450,8 @@
   <script>
     var targetDate = new Date("2026-09-18T17:00:00+02:00").getTime();
     var hasCelebrated = false;
+    var countdownMotionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var lastTitleConfettiAt = 0;
 
     /* Set a Ready value to false to show the waiting popup instead of opening that PDF. */
     var instructionsReady = true;
@@ -461,6 +526,26 @@
       if (map.getAttribute('src') !== mapUrl) map.src = mapUrl;
     }
 
+    function launchTitleConfetti() {
+      if (countdownMotionPreference.matches || typeof confetti !== 'function') return;
+
+      var now = Date.now();
+      if (now - lastTitleConfettiAt < 600) return;
+      lastTitleConfettiAt = now;
+
+      confetti({
+        particleCount: 65,
+        spread: 90,
+        startVelocity: 30,
+        scalar: 0.95,
+        origin: { x: 0.5, y: 0.25 },
+        colors: ['#ffffff', '#ffd447', '#ed1c24', '#0000ff'],
+        disableForReducedMotion: true
+      });
+    }
+
+    document.getElementById('confettiTrigger').addEventListener('click', launchTitleConfetti);
+
     function launchCelebration() {
       if (hasCelebrated) return;
       hasCelebrated = true;
@@ -483,30 +568,48 @@
       });
     }
 
+    function pulseCountdown() {
+      var timer = document.getElementById('timer');
+      timer.classList.remove('is-pulsing');
+
+      if (countdownMotionPreference.matches || document.hidden || timer.hidden) return;
+
+      /* Flush the previous animation so the next beat starts with this tick. */
+      void timer.offsetWidth;
+      timer.classList.add('is-pulsing');
+    }
+
     function updateTimer() {
       var now = Date.now();
       var distance = targetDate - now;
+      var timer = document.getElementById('timer');
 
       if (distance <= 0) {
-        document.getElementById('event-title').innerHTML = "HSV Diligentia ’26 is begonnen!<span class=\"event-subtitle\">God sta ons bij. Doe een shotje!</span>";
-        document.getElementById('timer').hidden = true;
+        document.getElementById('event-title-text').innerHTML = "HSV Diligentia ’26 is begonnen!<span class=\"event-subtitle\">God sta ons bij. Doe een shotje!</span>";
+        timer.classList.remove('is-pulsing', 'final-minute');
+        timer.hidden = true;
         clearInterval(intervalId);
         launchCelebration();
         return;
       }
 
+      var isFinalMinute = distance <= 60000;
+      timer.classList.toggle('final-minute', isFinalMinute);
+
       var days = Math.floor(distance / (1000 * 60 * 60 * 24));
       var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      /* Round up in the final minute so it reads 60 to 1, never an early zero. */
+      var seconds = isFinalMinute ? Math.ceil(distance / 1000) : Math.floor((distance % (1000 * 60)) / 1000);
 
       document.getElementById('days').textContent = days;
       document.getElementById('seg-days').style.display = days > 0 ? '' : 'none';
       document.getElementById('hours').textContent = hours;
       document.getElementById('seg-hours').style.display = hours > 0 || days > 0 ? '' : 'none';
       document.getElementById('minutes').textContent = minutes;
-      document.getElementById('seg-minutes').style.display = minutes > 0 || hours > 0 || days > 0 ? '' : 'none';
+      document.getElementById('seg-minutes').style.display = !isFinalMinute && (minutes > 0 || hours > 0 || days > 0) ? '' : 'none';
       document.getElementById('seconds').textContent = seconds;
+      pulseCountdown();
     }
 
     var roasts = [
