@@ -1,10 +1,21 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="nl" class="weekend-finished">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#ed1c24" />
-  <title>HSV Diligentia aftelklok</title>
+  <title>HSV Diligentia ’26 · Tot de volgende keer! #spapetti</title>
+  <script>
+    /*
+     * true: closing message and the house-style button only.
+     * For next year, set this to false to restore the full event page.
+     * Also update targetDate, the year in the headings/footer, PDF filenames,
+     * location details, quotes and tips for the new edition.
+     */
+    var weekendFinished = true;
+    document.documentElement.classList.toggle('weekend-finished', weekendFinished);
+    document.title = weekendFinished ? 'HSV Diligentia ’26 · Tot de volgende keer!' : 'HSV Diligentia aftelklok';
+  </script>
   <style>
     /* Import DM Serif Display and Sofia Sans before all other CSS rules */
     @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Sofia+Sans:wght@400;700&display=swap');
@@ -354,10 +365,34 @@
       letter-spacing: 0.025em;
       opacity: 0.72;
     }
+
+    /* Keep the event features in the source, but hide them on the closing page. */
+    #closing-title { display: none; }
+    .weekend-finished #closing-title { display: block; }
+
+    .weekend-finished #event-title,
+    .weekend-finished #timer,
+    .weekend-finished .location,
+    .weekend-finished .pdf-row,
+    .weekend-finished #roastBtn,
+    .weekend-finished #tipBtn,
+    .weekend-finished #message,
+    .weekend-finished #instructions-dialog { display: none; }
+
+    .weekend-finished .btn-row {
+      grid-template-columns: minmax(0, 14rem);
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
   </style>
 </head>
 <body>
   <div class="countdown">
+    <h1 id="closing-title">
+      HSV Diligentia ’26<br>is weer voorbij!
+      <span class="event-subtitle">Dank voor je aanwezigheid,<br>tot volgende keer!</span>
+    </h1>
+
     <h1 id="event-title" aria-live="polite">
       <button class="title-trigger" id="confettiTrigger" type="button" title="Klik voor een beetje confetti!">
         <span id="event-title-text">HSV Diligentia '26<br>begint over…</span>
@@ -408,7 +443,7 @@
       </div>
       <iframe class="location-map" id="location-map"
               title="Google Maps: Hammerweg 10, 7722 HW Dalfsen"
-              src="https://www.google.com/maps?q=Hammerweg%2010%2C%207722%20HW%20Dalfsen%2C%20Nederland&amp;z=15&amp;hl=nl&amp;output=embed"
+              data-src="https://www.google.com/maps?q=Hammerweg%2010%2C%207722%20HW%20Dalfsen%2C%20Nederland&amp;z=15&amp;hl=nl&amp;output=embed"
               width="320" height="200" loading="lazy"
               referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </section>
@@ -446,10 +481,11 @@
     </form>
   </dialog>
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script>
     var targetDate = new Date("2026-09-18T17:00:00+02:00").getTime();
     var hasCelebrated = false;
+    var celebrationPending = false;
+    var intervalId = null;
     var countdownMotionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
     var lastTitleConfettiAt = 0;
 
@@ -462,6 +498,7 @@
     var roomsFile = "HSVD_Kamerindeling-26.pdf";
 
     function setupPdfButton(buttonId, ready, file) {
+      if (weekendFinished) return;
       var button = document.getElementById(buttonId);
 
       if (ready) {
@@ -497,6 +534,7 @@
     };
 
     function renderLocation() {
+      if (weekendFinished) return;
       var placeholder = 'Nog even geheim';
       var fields = {
         province: 'location-province',
@@ -527,7 +565,7 @@
     }
 
     function launchTitleConfetti() {
-      if (countdownMotionPreference.matches || typeof confetti !== 'function') return;
+      if (weekendFinished || countdownMotionPreference.matches || typeof confetti !== 'function') return;
 
       var now = Date.now();
       if (now - lastTitleConfettiAt < 600) return;
@@ -544,14 +582,16 @@
       });
     }
 
-    document.getElementById('confettiTrigger').addEventListener('click', launchTitleConfetti);
-
     function launchCelebration() {
-      if (hasCelebrated) return;
-      hasCelebrated = true;
+      if (weekendFinished || hasCelebrated) return;
       document.body.classList.add('event-started');
 
-      if (typeof confetti !== 'function') return;
+      if (typeof confetti !== 'function') {
+        celebrationPending = true;
+        return;
+      }
+      hasCelebrated = true;
+      celebrationPending = false;
 
       [0, 850, 1700].forEach(function(delay, index) {
         setTimeout(function() {
@@ -572,7 +612,7 @@
       var timer = document.getElementById('timer');
       timer.classList.remove('is-pulsing');
 
-      if (countdownMotionPreference.matches || document.hidden || timer.hidden) return;
+      if (weekendFinished || countdownMotionPreference.matches || document.hidden || timer.hidden) return;
 
       /* Flush the previous animation so the next beat starts with this tick. */
       void timer.offsetWidth;
@@ -580,6 +620,7 @@
     }
 
     function updateTimer() {
+      if (weekendFinished) return;
       var now = Date.now();
       var distance = targetDate - now;
       var timer = document.getElementById('timer');
@@ -664,20 +705,8 @@
     ];
 
     function vibrate(ms=30){
-      if (navigator.vibrate) navigator.vibrate(ms);
+      if (!weekendFinished && navigator.vibrate) navigator.vibrate(ms);
     }
-
-    document.getElementById('roastBtn').addEventListener('click', function() {
-      var msg = roasts[Math.floor(Math.random()*roasts.length)];
-      document.getElementById('message').textContent = msg;
-      vibrate();
-    });
-
-    document.getElementById('tipBtn').addEventListener('click', function() {
-      var msg = tips[Math.floor(Math.random()*tips.length)];
-      document.getElementById('message').textContent = msg;
-      vibrate();
-    });
 
     (function(){
       var toggleBtn = document.getElementById('toggleStyleBtn');
@@ -688,12 +717,40 @@
       });
     })();
 
-    setupPdfButton('instructionsBtn', instructionsReady, instructionsFile);
-    setupPdfButton('corveeBtn', corveeReady, corveeFile);
-    setupPdfButton('roomsBtn', roomsReady, roomsFile);
-    renderLocation();
-    var intervalId = setInterval(updateTimer, 1000);
-    updateTimer();
+    if (!weekendFinished) {
+      document.getElementById('confettiTrigger').addEventListener('click', launchTitleConfetti);
+
+      document.getElementById('roastBtn').addEventListener('click', function() {
+        var msg = roasts[Math.floor(Math.random()*roasts.length)];
+        document.getElementById('message').textContent = msg;
+        vibrate();
+      });
+
+      document.getElementById('tipBtn').addEventListener('click', function() {
+        var msg = tips[Math.floor(Math.random()*tips.length)];
+        document.getElementById('message').textContent = msg;
+        vibrate();
+      });
+
+      setupPdfButton('instructionsBtn', instructionsReady, instructionsFile);
+      setupPdfButton('corveeBtn', corveeReady, corveeFile);
+      setupPdfButton('roomsBtn', roomsReady, roomsFile);
+      renderLocation();
+
+      /* Load the confetti library only while the event features are enabled. */
+      if (typeof confetti !== 'function') {
+        var confettiScript = document.createElement('script');
+        confettiScript.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js';
+        confettiScript.async = true;
+        confettiScript.onload = function() {
+          if (celebrationPending) launchCelebration();
+        };
+        document.head.appendChild(confettiScript);
+      }
+
+      intervalId = setInterval(updateTimer, 1000);
+      updateTimer();
+    }
   </script>
 </body>
 </html>
